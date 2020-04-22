@@ -76,21 +76,24 @@ def expand_hparams(hparams):
     """
     Construct the training script args from the hparams
     """
-    cmd = ''
+    cmd = hparams['command']+' '
     for field, val in hparams.items():
+        if field == 'command':
+            continue
         if type(val) is bool:
             if val is True:
                 cmd += '--{} '.format(field)
         elif val != 'None':
             cmd += '--{} {} '.format(field, val)
     cmd += '\''
-    return cmd
+    return eval(cmd)
 
 
 def exec_cmd(cmd):
     """
     Execute a command and print stderr/stdout to the console
     """
+    os.chdir(os.getcwd()+'/code')
     result = subprocess.run(cmd, stderr=subprocess.PIPE, shell=True)
     if result.stderr:
         message = result.stderr.decode("utf-8")
@@ -110,8 +113,8 @@ def construct_cmd(cmd, hparams, resources, job_name, logdir):
             cmd += '--cd_to_logdir '
             cmd += '--logdir {}/logs '.format(logdir)
 
-    cmd += expand_resources(resources)
-    cmd += expand_hparams(hparams)
+#    cmd += expand_resources(resources)
+    cmd = expand_hparams(hparams)
 
     if args.no_run:
         print(cmd)
@@ -306,7 +309,6 @@ def run_yaml(experiment, exp_name, runroot):
                                           runroot)
         cmd = construct_cmd(submit_cmd, hparams,
                             resource_copy, job_name, logdir)
-
         if not args.no_run:
             # copy code to NFS-mounted share
             copy_code(logdir, runroot, code_ignore_patterns)
@@ -336,7 +338,6 @@ def run_experiment(exp_fn):
         experiment[k] = v
 
     exp_name = os.path.splitext(os.path.basename(args.exp_yml))[0]
-
     assert 'HPARAMS' in experiment, 'experiment file is missing hparams'
 
     # Iterate over hparams if it's a list
