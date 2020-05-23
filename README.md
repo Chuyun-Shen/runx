@@ -10,15 +10,11 @@ runx helps to automate common tasks while doing research:
 
 ## Quick-start Installation
 
-Install with pip:
+Install with source for docker:
 ```
-> pip install runx
-```
-
-Install with source:
-```
-> git clone https://github.com/NVIDIA/runx
+> git clone https://github.com/Jarvis-K/runx
 > cd runx
+> git checkout -b docker origin/docker
 > python setup.py install --user
 ```
 
