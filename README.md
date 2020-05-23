@@ -104,11 +104,10 @@ HPARAMS:
 Now when we launch the jobs, runx automatically generates unique output directories and passes the paths to your training script:
 ```bash
 > python -m runx.runx sweep.yml
-
-submit_job --gpu 2 --cpu 16 --mem 128 -c "python train.py --lr 0.01 --solver sgd  --logdir /home/logs/athletic-wallaby_2020.02.06_14.19"
-submit_job --gpu 2 --cpu 16 --mem 128 -c "python train.py --lr 0.01 --solver adam  --logdir /home/logs/industrious-chicken_2020.02.06_14.19"
-submit_job --gpu 2 --cpu 16 --mem 128 -c "python train.py --lr 0.02 --solver sgd  --logdir /home/logs/arrogant-buffalo_2020.02.06_14.19"
-submit_job --gpu 2 --cpu 16 --mem 128 -c "python train.py --lr 0.02 --solver adam  --logdir /home/logs/vengeful-jaguar_2020.02.06_14.19"
+docker run -v "$(pwd)"/code:/vv -e PYTHONPATH=xxx -e PATH=xxx  --runtime=nvidia --gpus 1 image /bin/bash -c "cd MaCA/ && python train.py --lr 0.01 --solver sgd  --logdir /home/logs/athletic-wallaby_2020.02.06_14.19"
+docker run -v "$(pwd)"/code:/vv -e PYTHONPATH=xxx -e PATH=xxx  --runtime=nvidia --gpus 1 image /bin/bash -c "cd MaCA/ && python train.py --lr 0.01 --solver adam  --logdir /home/logs/industrious-chicken_2020.02.06_14.19"
+docker run -v "$(pwd)"/code:/vv -e PYTHONPATH=xxx -e PATH=xxx  --runtime=nvidia --gpus 1 image /bin/bash -c "cd MaCA/ && python train.py --lr 0.02 --solver sgd  --logdir /home/logs/arrogant-buffalo_2020.02.06_14.19"
+docker run -v "$(pwd)"/code:/vv -e PYTHONPATH=xxx -e PATH=xxx  --runtime=nvidia --gpus 1 image /bin/bash -c "cd MaCA/ && python train.py --lr 0.02 --solver adam  --logdir /home/logs/vengeful-jaguar_2020.02.06_14.19"
 ```
 
 After you've run your experiment, you will likely want to summarize the results. 
