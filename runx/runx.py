@@ -71,6 +71,22 @@ def expand_resources(resources):
             cmd += '--{} {} '.format(field, val)
     return cmd
 
+def expand_envs(envs):
+    """
+    Construct the submit_job arguments from the envs dict
+    """
+    cmd = ''
+    for field, val in envs.items():
+        cmd += '-e {}={} '.format(field, val)
+    return cmd
+
+def expand_v(v):
+    """
+    Construct the submit_job arguments from the mount dict
+    """
+    cmd = '-v "$(pwd)"/code:' + v +' '
+    return cmd
+
 
 def expand_hparams(hparams):
     """
@@ -85,22 +101,21 @@ def expand_hparams(hparams):
                 cmd += '--{} '.format(field)
         elif val != 'None':
             cmd += '--{} {} '.format(field, val)
-    cmd += '\''
-    return eval(cmd)
+    cmd += '"'
+    return cmd
 
 
 def exec_cmd(cmd):
     """
     Execute a command and print stderr/stdout to the console
     """
-    os.chdir(os.getcwd()+'/code')
     result = subprocess.run(cmd, stderr=subprocess.PIPE, shell=True)
     if result.stderr:
         message = result.stderr.decode("utf-8")
         print(message)
 
 
-def construct_cmd(cmd, hparams, resources, job_name, logdir):
+def construct_cmd(cmd, image, v, envs, hparams, resources, job_name, logdir):
     """
     Expand the hyperparams into a commandline
     """
@@ -112,9 +127,12 @@ def construct_cmd(cmd, hparams, resources, job_name, logdir):
         if 'submit_job' in cmd:
             cmd += '--cd_to_logdir '
             cmd += '--logdir {}/logs '.format(logdir)
-
-#    cmd += expand_resources(resources)
-    cmd = expand_hparams(hparams)
+    cmd += expand_v(v)
+    cmd += expand_envs(envs)
+    cmd += expand_resources(resources)
+    cmd += image +' '
+    cmd += '/bin/bash -c '
+    cmd += expand_hparams(hparams)
 
     if args.no_run:
         print(cmd)
@@ -279,13 +297,16 @@ def run_yaml(experiment, exp_name, runroot):
     Run an experiment, expand hparams
     """
     resources = get_field(experiment, 'RESOURCES')
+    image = get_field(experiment, 'IMAGE')
+    V = get_field(experiment, 'V')
+    envs = get_field(experiment, 'ENVS')
     submit_cmd = get_field(experiment, 'SUBMIT_CMD') + ' '
     logroot = get_field(experiment, 'LOGROOT')
     code_ignore_patterns = get_code_ignore_patterns(experiment)
 
     # Build the args that the submit_cmd will see
     yaml_hparams = OrderedDict()
-    yaml_hparams['command'] = '\'{}'.format(experiment['CMD'])
+    yaml_hparams['command'] = '"cd {} && {}'.format(V, experiment['CMD'])
 
     # Add yaml_hparams
     for k, v in experiment['HPARAMS'].items():
@@ -307,8 +328,9 @@ def run_yaml(experiment, exp_name, runroot):
         resource_copy = resources.copy()
         hparams_out = hacky_substitutions(hparams, resource_copy, logdir,
                                           runroot)
-        cmd = construct_cmd(submit_cmd, hparams,
+        cmd = construct_cmd(submit_cmd, image, V, envs, hparams,
                             resource_copy, job_name, logdir)
+
         if not args.no_run:
             # copy code to NFS-mounted share
             copy_code(logdir, runroot, code_ignore_patterns)
