@@ -1,5 +1,5 @@
 # runx - An experiment management tool
-
+This is an variant of runx to surpport docker users. 
 runx helps to automate common tasks while doing research:
 * hyperparameter sweeps
 * logging, tensorboard, checkpoint management
@@ -59,11 +59,16 @@ LOGROOT: /home/logs
 FARM: bigfarm
 
 bigfarm:
-  SUBMIT_CMD: 'submit_job'
+  SUBMIT_CMD: 'docker run'
+  IMAGE: 'image'
+  V: '/vv'
   RESOURCES:
-     gpu: 2
-     cpu: 16
-     mem: 128
+     runtime: nvidia
+     gpus: 1
+  ENVS:
+    PYTHONPATH: xxx
+    PATH: xxx
+
 ```
 You've told it a few things here: where to put the assets for each run, under /home/logs, and
 what command and what resources to use to submit each run to the farm.
@@ -74,10 +79,10 @@ definition to perform submissions.
 ```bash
 > python -m runx.runx sweep.yml
 
-submit_job --gpu 2 --cpu 16 --mem 128 -c "python train.py --lr 0.01 --solver sgd"
-submit_job --gpu 2 --cpu 16 --mem 128 -c "python train.py --lr 0.01 --solver adam"
-submit_job --gpu 2 --cpu 16 --mem 128 -c "python train.py --lr 0.02 --solver sgd"
-submit_job --gpu 2 --cpu 16 --mem 128 -c "python train.py --lr 0.02 --solver adam"
+docker run -v "$(pwd)"/code:/vv -e PYTHONPATH=xxx -e PATH=xxx  --runtime=nvidia --gpus 1 image /bin/bash -c "cd MaCA/ && python train.py --lr 0.01 --solver sgd"
+docker run -v "$(pwd)"/code:/vv -e PYTHONPATH=xxx -e PATH=xxx  --runtime=nvidia --gpus 1 image /bin/bash -c "cd MaCA/ && python train.py --lr 0.01 --solver adam"
+docker run -v "$(pwd)"/code:/vv -e PYTHONPATH=xxx -e PATH=xxx  --runtime=nvidia --gpus 1 image /bin/bash -c "cd MaCA/ && python train.py --lr 0.02 --solver sgd"
+docker run -v "$(pwd)"/code:/vv -e PYTHONPATH=xxx -e PATH=xxx  --runtime=nvidia --gpus 1 image /bin/bash -c "cd MaCA/ && python train.py --lr 0.02 --solver sgd"
 ```
 Here, submit_job is a placeholder for your farm submission command.
 
