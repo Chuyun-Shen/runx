@@ -1,5 +1,5 @@
 # runx - An experiment management tool
-
+This is a variant of runx. It surpports the single machine runing. U can use `conda` or `pip` to custom your environment, work with runx u wiil get these features:
 runx helps to automate common tasks while doing research:
 * hyperparameter sweeps
 * logging, tensorboard, checkpoint management
@@ -172,9 +172,7 @@ Create a .runx file within your repo using the example below.
 The .runx file defines whether and how to submit jobs to your compute cluster, and where to put the output.
 
 * `LOGROOT` - the root directory where you want your logs placed. This is a path that any farm job can write to.
-* `FARM` - if defined, jobs should be submitted to this farm, else run interactively
-* `SUBMIT_CMD` - the cluster submission command
-* `RESOURCES` - hyperparameters passed to `submit_cmd`
+* `FARM`, `·SUBMIT_CM`,  RESOURCES` are ignored for single machine running 
 * `CODE_IGNORE_PATTERNS` - ignore these files patterns when copying code to output directory
 
 Here's an example of such a file:
