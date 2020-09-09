@@ -39,10 +39,7 @@ import subprocess
 import time
 
 
-try:
-    from torch.utils.tensorboard import SummaryWriter
-except ModuleNotFoundError:
-    from tensorboardX import SummaryWriter
+from tensorboardX import SummaryWriter
 
 import torch
 

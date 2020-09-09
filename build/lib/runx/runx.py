@@ -285,10 +285,10 @@ def run_yaml(experiment, exp_name, runroot):
 
     # Build the args that the submit_cmd will see
     yaml_hparams = OrderedDict()
-    yaml_hparams['command'] = '\'{}'.format(experiment['CMD'])
+    yaml_hparams['command'] = '\'{}'.format(experiment['cmd'])
 
     # Add yaml_hparams
-    for k, v in experiment['HPARAMS'].items():
+    for k, v in experiment['hparams'].items():
         yaml_hparams[k] = v
 
     # Calculate cross-product of hyperparams
@@ -338,22 +338,22 @@ def run_experiment(exp_fn):
         experiment[k] = v
 
     exp_name = os.path.splitext(os.path.basename(args.exp_yml))[0]
-    assert 'HPARAMS' in experiment, 'experiment file is missing hparams'
+    assert 'hparams' in experiment, 'experiment file is missing hparams'
 
     # Iterate over hparams if it's a list
     runroot = os.getcwd()
-    if isinstance(experiment['HPARAMS'], (list, tuple)):
+    if isinstance(experiment['hparams'], (list, tuple)):
         # Support inheritance from the first hparams item in list
-        first_hparams = experiment['HPARAMS'][0].copy()
+        first_hparams = experiment['hparams'][0].copy()
 
-        for hparams_set in experiment['HPARAMS']:
+        for hparams_set in experiment['hparams']:
             hparams = first_hparams.copy()
             # Inheritance = first hparam set, updated with current hparam set
             hparams.update(hparams_set)
 
             # create a clean copy of the experiment and fill in hparams
             experiment_copy = experiment.copy()
-            experiment_copy['HPARAMS'] = hparams
+            experiment_copy['hparams'] = hparams
 
             run_yaml(experiment_copy, exp_name, runroot)
     else:
