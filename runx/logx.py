@@ -200,6 +200,13 @@ class LogX(object):
         '''
         self.tensorboard.add_scalar(name, val, idx)
 
+    # Add function add_scalars by chuyun-shen
+    def add_scalars(self, name, val_dict, idx):
+        '''
+        Write a scalar to the tensorboard file
+        '''
+        self.tensorboard.add_scalars(name, val_dict, idx)
+
     def _flush_tensorboard(self):
         if self.eager_flush and self.tb_writer is not None:
             self.tb_writer.flush()
