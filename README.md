@@ -8,18 +8,13 @@ runx helps to automate common tasks while doing research:
 * code checkpointing
 * easy integration
 
-## Quick-start Installation
-
-Install with pip:
-```
-> pip install runx
-```
+## Installation
 
 Install with source:
 ```
-> git clone https://github.com/NVIDIA/runx
+> git clone https://github.com/Chuyun-Shen/runx.git
 > cd runx
-> python setup.py install --user
+> python setup.py install 
 ```
 
 ## Introduction: a simple example
@@ -148,23 +143,6 @@ runx consists of three main modules:
 
 These modules are intended to be used jointly, but if you just want to use runx, that's fine.
 However using sumx requires that you've used logx to record metrics.
-
-
-
-## Installation
-
-The easiest way to install is via pip:
-
-```bash
-> pip install runx --extra-index-url=https://pypi.perflab.nvidia.com
-```
-
-Alternatively, you could make runx a git submodule of your project:
-
-``` bash
-cd <your repo>
-git submodule add -b master ssh://git@gitlab-master.nvidia.com:runx.git
-```
 
 ## Create a project-specific configuration file
 
@@ -306,12 +284,13 @@ Make sure that you're only calling logx from rank=0, in the event that you're us
 
 Then, substitute the following logx calls into your code:
 
-| From                | To                | What                      |
-| ------------------- | ----------------- | ------------------------- |
-| print()             | logx.msg()        | stdout messages           |
-| writer.add_scalar() | logx.add_scalar() | tensorboard scalar writes |
-| writer.add_image()  | logx.add_image()  | tensorboard image writes  |
-|                     | logx.save_model() | save latest/best models   |
+| From                 | To                 | What                      |
+| -------------------- | ------------------ | ------------------------- |
+| print()              | logx.msg()         | stdout messages           |
+| writer.add_scalar()  | logx.add_scalar()  | tensorboard scalar writes |
+| writer.add_scalars() | logx.add_scalars() | tensorboard scalar writes |
+| writer.add_image()   | logx.add_image()   | tensorboard image writes  |
+|                      | logx.save_model()  | save latest/best models   |
 
 Finally, in order for sumx to be able to read the results of your run, you have to push your metrics to logx. You should definitely push the 'val' metrics, but can push 'train' metrics if you like (sumx doesn't consume them at the moment). 
 
